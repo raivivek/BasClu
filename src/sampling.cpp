@@ -1,11 +1,9 @@
 #include <RcppArmadillo.h>
+
 // [[Rcpp::depends("RcppArmadillo")]]
 
 using namespace Rcpp;
 using namespace arma;
-
-//Rcpp::wrap -- converts C++ to R objs
-//Rcpp::as -- converts R objs to C++
 
 // Get probability given variable
 vec pnormVec(const vec& a, double mu, double sigma, int lt, int lg){
@@ -33,6 +31,7 @@ IntegerVector rmultinomC(int n, NumericVector prob){
 }
 
 
+// Sample g
 void gSample(vec& g, int ng, mat& x, mat& dz, mat& sig2, rowvec& s, vec& gammam, vec& denom, uvec& idx_na, double nu_g, double tausq_g, vec& upd, const vec& step_g){
     vec g_temp = rnormVec(g, step_g);
     vec g_diff = g_temp - g;
@@ -49,17 +48,20 @@ void gSample(vec& g, int ng, mat& x, mat& dz, mat& sig2, rowvec& s, vec& gammam,
 }
 
 
+// Sample g hyperparameter νg from
 double nu_gSample(double m_g, double dsq_g, double tausq_g, vec& g, int ng){
     double v = 1 / (1 / dsq_g + ng / tausq_g);
     return R::rnorm((m_g / dsq_g + sum(g) / tausq_g) * v, sqrt(v));
 }
 
 
+// Sample g hyperparameter τg2 from
 double tausq_gSample(double a_g, double b_g, double nu_g, vec& g, int ng){
     return 1 / R::rgamma(a_g + ng / 2, 1 / (b_g + sum(pow(g - nu_g, 2)) / 2));
 }
 
 
+// Sample Gene-specific expression increment δj
 void deltaSample(vec& delta, int ng, int ns, mat& mis, mat& z, mat& psi, vec& sigma1sq, mat& mus, vec& gammam, double alpha_delta, double beta_delta, vec& upd, const vec& step_delta){
     vec delta_temp = rnormVec(delta, step_delta);
     uvec idx_pos = find(delta_temp > 0);
@@ -87,11 +89,13 @@ void deltaSample(vec& delta, int ng, int ns, mat& mis, mat& z, mat& psi, vec& si
 }
 
 
+// Sample δ hyperparameter βδ from
 double beta_deltaSample(double a_l, double b_l, double alpha_delta, vec& delta, int ng){
     R::rgamma(a_l + ng * alpha_delta, 1 / (b_l + sum(delta)));
 }
 
 
+// Sample σ0 hyperparameter β0 from
 void sigma0sqSample(vec& sigma0sq, int ns, mat& mis, mat& z, mat& psi, mat& mus, vec& gammam, double alpha0, double beta0, vec& upd, const vec& step_s0){
     vec sigma0sq_temp = rnormVec(sigma0sq, step_s0);
     uvec idx_pos = find(sigma0sq_temp > 0);
@@ -122,11 +126,13 @@ void sigma0sqSample(vec& sigma0sq, int ns, mat& mis, mat& z, mat& psi, mat& mus,
 }
 
 
+// Sample beta0
 double beta0Sample(double a_l, double b_l, double alpha0, vec& sigma0sq, int ng){
     return R::rgamma(alpha0 * ng + a_l, 1 / (sum(1 / sigma0sq) + b_l));
 }
 
 
+// Sample σ1 hyperparameter β1 from
 void sigma1sqSample(vec& sigma1sq, int ns, mat& mis, mat& z, mat& psi, mat& mus, vec& delta, vec& gammam, double alpha1, double beta1, vec& upd, const vec& step_s1){
     vec sigma1sq_temp = rnormVec(sigma1sq, step_s1);
     uvec idx_pos = find(sigma1sq_temp > 0);
@@ -156,11 +162,13 @@ void sigma1sqSample(vec& sigma1sq, int ns, mat& mis, mat& z, mat& psi, mat& mus,
 }
 
 
+// Sample beta1
 double beta1Sample(double a_l, double b_l, double alpha1, vec& sigma1sq, int ng){
     return R::rgamma(alpha1 * ng + a_l, 1 / (sum(1 / sigma1sq) + b_l));
 }
 
 
+// Sample binary expression status zij
 void zSample(int nuc, int ng, List& idx_c, mat& psi, mat& mus, mat& mis, mat& z, vec& delta, vec& sigma0sq, vec& sigma1sq, vec& gammam, double beta_pi, double alpha_pi){
     uvec idx_k, j;
     int nk;
@@ -197,6 +205,7 @@ void zSample(int nuc, int ng, List& idx_c, mat& psi, mat& mus, mat& mis, mat& z,
 }
 
 
+// Sample dropout probability parameters γ = (γ1,γ2)T
 void gammamSample(vec& gammam, double nu1, double tau1sq, double nu2, double tau2sq, uvec& idx_na, uvec& idx_nna, mat& sig2, mat& x, mat& mut, double& upd, double step_gamma){
     vec gammam_temp = rnormVec(gammam, ones<vec>(2) * step_gamma);
     if ((pow(gammam(0) - nu1, 2) - pow(gammam_temp(0) - nu1, 2)) / (2 * tau1sq) + (pow(gammam(1) - nu2, 2) - pow(gammam_temp(1) - nu2, 2)) / (2 * tau2sq) + sum(pnormVec((gammam_temp(0) * mut(idx_na) + gammam_temp(1)) / sqrt(1 + pow(gammam_temp(0), 2) * sig2(idx_na)), 0, 1, 1, 1) - pnormVec((gammam(0) * mut(idx_na) + gammam(1)) / sqrt(1 + pow(gammam(0), 2) * sig2(idx_na)), 0, 1, 1, 1)) + sum(pnormVec(gammam_temp(0) * x(idx_nna) + gammam_temp(1), 0, 1, 0, 1) - pnormVec(gammam(0) * x(idx_nna) + gammam(1), 0, 1, 0, 1)) > log(R::runif(0, 1))){
@@ -206,6 +215,7 @@ void gammamSample(vec& gammam, double nu1, double tau1sq, double nu2, double tau
 }
 
 
+// Sample component label ci
 void cluSample(Row<int>& clu, int ns, int ng, double alpha_pi, double beta_pi, mat& z, double alpha_lambda){
     uvec idx, idx_k;
     Col<int> ci, uci;
@@ -247,6 +257,7 @@ void cluSample(Row<int>& clu, int ns, int ng, double alpha_pi, double beta_pi, m
 }
 
 
+// Sample expression probability π hyperparameter βπ
 List beta_piSample(double beta_pi, double alpha_pi, double a_l, double b_l, int ng, Row<int>& uc, List idx_c, mat& z, double& upd, double step_bp){
     double beta_pi_temp = R::rnorm(beta_pi, step_bp);
     double lprob = ng * uc.n_elem * (lgamma(alpha_pi + beta_pi) - lgamma(alpha_pi) - lgamma(beta_pi)) + (a_l - 1) * log(beta_pi) - b_l * beta_pi;
@@ -276,6 +287,7 @@ List beta_piSample(double beta_pi, double alpha_pi, double a_l, double b_l, int 
 }
 
 
+// Sample Drichlet-process concentration parameter αλ
 List alpha_lambdaSample(double alpha_lambda, double a_l, double b_l, int ns, Row<int>& uc, double& upd, double step_al){
     double alpha_lambda_temp = R::rnorm(alpha_lambda, step_al);
     double lprob = (a_l + uc.n_elem - 1) * log(alpha_lambda) - b_l * alpha_lambda + lgamma(alpha_lambda) - lgamma(alpha_lambda + ns);
@@ -344,11 +356,17 @@ void sampling(mat& x, rowvec& s, int NT, int nthin, int nupd, int Nburn,
         tausq_g = tausq_gSample(a_g, b_g, nu_g, g, ng);
 
         deltaSample(delta, ng, ns, mis, z, psi, sigma1sq, mus, gammam, alpha_delta, beta_delta, upd_d, step.rows(ng, 2 * ng - 1));
+
         beta_delta = beta_deltaSample(a_l, b_l, alpha_delta, delta, ng);
+
         sigma0sqSample(sigma0sq, ns, mis, z, psi, mus, gammam, alpha0, beta0, upd_s0, step.rows(2 * ng, 3 * ng - 1));
+
         beta0 = beta0Sample(a_l, b_l, alpha0, sigma0sq, ng);
+
         sigma1sqSample(sigma1sq, ns, mis, z, psi, mus, delta, gammam, alpha1, beta1, upd_s1, step.rows(3 * ng, 4 * ng - 1));
+
         beta1 = beta1Sample(a_l, b_l, alpha1, sigma1sq, ng);
+
         zSample(nuc, ng, idx_c, psi, mus, mis, z, delta, sigma0sq, sigma1sq, gammam, beta_pi, alpha_pi);
 
         dz = z.each_col() % delta;
