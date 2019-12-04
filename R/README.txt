@@ -1,15 +1,16 @@
 ##### variables need to define in R before running BasClu.R
-# x: a matrix of log(counts), with rows representing genes and columns representing cells 
+# x: a matrix of log(counts), with rows representing genes and columns representing cells
 # s: log library size
 # NT: number of MCMC iterations
 # nthin: for chain thinning; one sample is kept for every nthin iterations
-# nupd: for adaptive adjustment of random walk step in the burn-in stage; random walk steps are updated once every nupd iterations in the burn-in stage 
+# nupd: for adaptive adjustment of random walk step in the burn-in stage; random walk steps are updated once every nupd iterations in the burn-in stage
 # Nburn: number of iterations for burn-in
 # g: initial values for vector g (length equals number of genes; detailed definition of this variable and following ones are given in the method session of the main manuscript)
 # nu.g: initial value for parameter nu.g
 # tausq.g: initial value for parameter tausq.g
 # delta: initial value for vector delta (length equals number of genes)
-# beta.delta: initial value for parameter beta.delta sigma0sq, beta0, sigma1sq, beta1, z, # gammam: initial value for (gamma1, gamma2)
+# beta.delta: initial value for parameter beta.delta sigma0sq, beta0, sigma1sq, beta1, z,
+# gammam: initial value for (gamma1, gamma2)
 # clu: initial value for cell clustering (length equals number of cells)
 # beta.pi: initial value for parameter beta.pi
 # alpha.lambda: initial value for parameter alpha.lambda

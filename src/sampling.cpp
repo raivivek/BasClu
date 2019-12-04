@@ -4,19 +4,25 @@
 using namespace Rcpp;
 using namespace arma;
 
+//Rcpp::wrap -- converts C++ to R objs
+//Rcpp::as -- converts R objs to C++
 
+// Get probability given variable
 vec pnormVec(const vec& a, double mu, double sigma, int lt, int lg){
     return as<vec>(wrap(pnorm(as<NumericVector>(wrap(a)), mu, sigma, lt, lg)));
 }
 
+// Get normal random variables
 vec rnormVec(const vec& mu, const vec& sigma){
     return as<vec>(wrap(mapply(as<NumericVector>(wrap(mu)), as<NumericVector>(wrap(sigma)), R::rnorm)));
 }
 
+// Get n bernoulli trials
 vec rbinomVec(const vec& n, const vec& p){
     return as<vec>(wrap(mapply(as<NumericVector>(wrap(n)), as<NumericVector>(wrap(p)), R::rbinom)));
 }
 
+// Get multinomial random variables
 IntegerVector rmultinomC(int n, NumericVector prob){
     //n is size instead of total number of random samples
     //stackoverflow.com/questions/24618370/using-rmultinom-with-rcpp
@@ -287,15 +293,25 @@ List alpha_lambdaSample(double alpha_lambda, double a_l, double b_l, int ns, Row
 
 
 // [[Rcpp::export]]
-void sampling(mat& x, rowvec& s, int NT, int nthin, int nupd, int Nburn, vec& g, double nu_g, double tausq_g, vec& delta, double beta_delta, vec& sigma0sq, double beta0, vec& sigma1sq, double beta1, mat& z, vec& gammam, Row<int>& clu, double beta_pi, double alpha_lambda, mat& g_seq, mat& delta_seq, mat& sigma0sq_seq, mat& sigma1sq_seq, mat& z_seq, Mat<int>& c_seq, mat& gamma_seq, vec& beta_pi_seq, vec& alpha_lambda_seq, vec& nu_g_seq, vec& tausq_g_seq, vec& beta_delta_seq, vec& beta0_seq, vec& beta1_seq, vec& llambda, vec& lpi, vec& lobs, vec& lother, vec& lpost, double m_g, double dsq_g, double a_g, double b_g, double alpha_delta, double alpha0, double alpha1, double a_l, double b_l, double nu1, double tau1sq, double nu2, double tau2sq, double alpha_pi){
+void sampling(mat& x, rowvec& s, int NT, int nthin, int nupd, int Nburn,
+              vec& g, double nu_g, double tausq_g, vec& delta, double beta_delta,
+              vec& sigma0sq, double beta0, vec& sigma1sq, double beta1, mat& z,
+              vec& gammam, Row<int>& clu, double beta_pi, double alpha_lambda,
+              mat& g_seq, mat& delta_seq, mat& sigma0sq_seq, mat& sigma1sq_seq,
+              mat& z_seq, Mat<int>& c_seq, mat& gamma_seq, vec& beta_pi_seq,
+              vec& alpha_lambda_seq, vec& nu_g_seq, vec& tausq_g_seq,
+              vec& beta_delta_seq, vec& beta0_seq, vec& beta1_seq, vec& llambda, vec& lpi,
+              vec& lobs, vec& lother, vec& lpost, double m_g, double dsq_g, double a_g,
+              double b_g, double alpha_delta, double alpha0, double alpha1, double a_l, double b_l,
+              double nu1, double tau1sq, double nu2, double tau2sq, double alpha_pi) {
 
+    // Check finite/non-finite values (NaN, Inf) etc using Armadillo
     uvec idx_na = find_nonfinite(x), idx_nna = find_finite(x), idx;
     int ng = x.n_rows, ns = x.n_cols, l;
 
     // binarize the matrix
     mat mis(ng, ns, fill::zeros);
     mis(idx_na).fill(1.0);
-
 
     mat dz = z.each_col() % delta;
     mat sig2 = as<mat>(wrap(1 - z)).each_col() % sigma0sq + z.each_col() % sigma1sq;
@@ -316,6 +332,7 @@ void sampling(mat& x, rowvec& s, int NT, int nthin, int nupd, int Nburn, vec& g,
     double lprob_alpha_lambda, lprob_beta_pi;
     mat mus = zeros<mat>(ng, ns);
 
+    // Do MCMC iterations; NT --> number of iterations
     for (int nt = 0; nt < NT; nt++){
         gSample(g, ng, x, dz, sig2, s, gammam, denom, idx_na, nu_g, tausq_g, upd_g, step.rows(0, ng - 1));
 
