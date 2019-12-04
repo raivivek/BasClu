@@ -1,0 +1,52 @@
+---
+title: "Hierarchical Bayesian Model for Clustering of Single-cell RNA-seq Data"
+author: "Liu et al (2019), R-package by Rai and Wang."
+date: "`r format(Sys.Date(), '%m/%d/%Y')`"
+abstract: >
+  Liu et al (2019) proposed a novel hierarchical clustering method under a Bayesian
+  setting, called BasClu (Bayesian scRNA-seq Clustering) for clustering of zero-
+  inflated, sparse data from single-cell RNA-sequencing (scRNA-seq) experiments. BasClu,
+  unlike existing methods that cluster cells based on gene expression values directly,
+  infers and utilizes a dichotomized gene expression status to cluster cells. In
+  addition, BasClu explicitly models the missing probability for each gene to account
+  for dropout events, and it also incorporates sequencing features, such as gene length
+  and library size into the dropout modeling framework.
+  
+  Here, we a) implement the BasClu algorithm, and b) provide a well-documented, easy to
+  use interface for applying the technique to new single-cell RNA-seq dataset.
+output:
+  rmarkdown::html_document:
+    highlight: pygments
+    toc: true
+    fig_width: 5
+vignette: >
+  %\VignetteIndexEntry{Hierarchical Bayesian Model for Clustering of Single-cell RNA-seq Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\usepackage[utf8]{inputenc}
+---
+
+```{r setup, echo=FALSE, results="hide"}
+knitr::opts_chunk$set(tidy = FALSE,
+                      cache = FALSE,
+                      dev = "png",
+                      message = FALSE, error = FALSE, warning = TRUE)
+```
+
+# Introduction
+
+## Rationale
+
+## Quick start
+
+# Usage
+## Input data
+
+# Epilogue
+## Acknowledgments
+
+## Session info
+
+```{r sessionInfo}
+sessionInfo()
+```

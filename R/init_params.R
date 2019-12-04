@@ -63,7 +63,6 @@ beta1 <- rgamma(1, shape = a.d, rate = b.d)
 sigma0sq <- ##
 sigma1sq <- ##
 
-
 # nu.g: initial value for parameter nu.g
 nu.g <- rnorm(1, m.g, dsq.g)
 
