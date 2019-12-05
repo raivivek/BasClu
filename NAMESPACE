@@ -1,5 +1,2 @@
 useDynLib(BasClu)
-importFrom(Rcpp, sourceCpp)
-importFrom("stats", "rbinom", "rgamma", "rnorm")
-importFrom("invgamma", "rinvgamma")
-exportPattern("ˆ[[:alpha:]]+")
+export(basclu)

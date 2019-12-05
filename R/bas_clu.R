@@ -36,7 +36,7 @@ init_params <<- function() {
 
   # nu.g: initial value for parameter nu.g
   # USES: m.g, dsq.g
-  nu.g <<- rnorm(m.g, dsq.g)
+  nu.g <<- stats::rnorm(m.g, dsq.g)
 
   # a.g: value of hyper-parameter a.g
   # b.g: value of hyper-parameter b.g
@@ -66,24 +66,24 @@ init_params <<- function() {
   ################################################
 
   # beta.delta: initial value for parameter beta.delta, beta0, beta1
-  beta.delta <<- rgamma(1, shape = a.d, rate = b.d)
-  beta0 <<- rgamma(1, shape = a.d, rate = b.d)
-  beta1 <<- rgamma(1, shape = a.d, rate = b.d)
+  beta.delta <<- stats::rgamma(1, shape = a.d, rate = b.d)
+  beta0 <<- stats::rgamma(1, shape = a.d, rate = b.d)
+  beta1 <<- stats::rgamma(1, shape = a.d, rate = b.d)
 
   # nu.g: initial value for parameter nu.g
-  nu.g <<- rnorm(1, m.g, dsq.g)
+  nu.g <<- stats::rnorm(1, m.g, dsq.g)
 
   # beta.pi: initial value for parameter beta.pi
-  beta.pi <<- rgamma(1, shape = a.p, rate = b.p)
+  beta.pi <<- stats::rgamma(1, shape = a.p, rate = b.p)
 
   # tausq.g: initial value for parameter tausq.g
   tausq.g <<- invgamma::rinvgamma(n = 1, shape = a.g, rate = b.g)
 
   # alpha.lambda: initial value for parameter alpha.lambda
-  alpha.lambda <<- rgamma(1, shape = a.l, rate = b.l)
+  alpha.lambda <<- stats::rgamma(1, shape = a.l, rate = b.l)
 
   # gammam: initial value for (gamma1, gamma2)
-  gammam <<- mapply(rnorm, c(1, 1), c(nu1, nu2), c(tau1sq, tau2sq))
+  gammam <<- mapply(stats::rnorm, c(1, 1), c(nu1, nu2), c(tau1sq, tau2sq))
 }
 
 
@@ -91,13 +91,13 @@ initialize_values <- function() {
   #############################################
   # Input dependent parameters
   #############################################
-  g <<- rnorm(ng, nu.g, tausq.g) # g: initial value of g (length = no. of genes)
+  g <<- stats::rnorm(ng, nu.g, tausq.g) # g: initial value of g (length = no. of genes)
   sigma0sq <<- invgamma::rinvgamma(ng, shape = alpha0, rate = beta0) # sigma0sq: initial value
   sigma1sq <<- invgamma::rinvgamma(ng, shape = alpha1, rate = beta1) # sigma1sq: initial value
-  delta <<- rgamma(ng, alpha.delta, beta.delta) # delta: initial value of delta (length = no. of genes)
+  delta <<- stats::rgamma(ng, alpha.delta, beta.delta) # delta: initial value of delta (length = no. of genes)
 
-  clu <<-  rbinom(n = ns, size = 4, prob = 1/4) # clu: initial value for cell clustering (length = number of cells)
-  z <<- matrix(0, ng, ns)
+  clu <<-  stats::rbinom(n = ns, size = 4, prob = 1/4) # clu: initial value for cell clustering (length = number of cells)
+  z <<- matrix(do.call(cbind, lapply(1:ns, function(x) stats::rbeta(ng, alpha.pi, beta.pi))))
 }
 
 ## Posterior samples
@@ -126,19 +126,32 @@ initialize_posteriors <- function() {
 }
 
 
-BasClu <- function(x, s, NT, nthin, nupd, Nburn, clustering = "BasCluZ", ...) {
+#' Run BasClu.
+#'
+#' @param x Log-transformed count matrix
+#' @param s Log library sizes
+#' @param NT Number of MCMC iterations
+#' @param nthin For thinning: keep sample every nthin iteration
+#' @param nupd For updating random walk during burn-in
+#' @param Nburn Number of iterations for burn-in
+#' @param clustering Clustering method to use
+#' @param ... Additional params
+#'
+#' @return z Z-matrix
+#' @export
+basclu <- function(x, s, NT, nthin, nupd, Nburn, clustering = "BasCluZ", ...) {
   stopifnot(is.matrix(x) && is.matrix(s))
 
   # MCMC Parameters
   NT <- 10000   # NT: number of MCMC iterations
   nthin <- 5    # nthin: for chain thinning; one sample is kept for every nthin iterations
   nupd <- 10   # nupd: random walk steps are updated once every nupd iterations in the burn-in stage
-  Nburn <- 100  # Nburn: number of iterations for burn-in
+  Nburn <- 1000  # Nburn: number of iterations for burn-in
   nrcd = (NT - Nburn) / nthin
 
   # Get dimensions
-  ng <- dim(x)[1]
-  ns <- dim(x)[2]
+  ng <<- dim(x)[1]
+  ns <<- dim(x)[2]
 
   # Setup all parameters
   init_params()

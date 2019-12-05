@@ -446,4 +446,3 @@ void sampling(mat& x, rowvec& s, int NT, int nthin, int nupd, int Nburn,
     }
     lpost = llambda + lpi + lobs + lother;
 }
-
