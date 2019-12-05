@@ -10,7 +10,7 @@ dependencies, both of which can be installed from CRAN repository.
 devtools::install_github("raivivek/BasClu")
 ```
 ```
-BasClu(x, s, NT = 10000,nthin = 5, nupd = 100, Nburn = 100, Clustering = BasCluZ, ...)
+BasClu(x, s, NT = 10000, nthin = 5, nupd = 100, Nburn = 100, Clustering = BasCluZ, ...)
 ```
 
 This is a work in progress. Use at your own risk.
