@@ -5,9 +5,26 @@ Authors@R:
     person(given = "Vivek",
            family = "Rai",
            role = c("aut", "cre"),
-           email = "vivekrai@umich.edu",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+           email = "vivekrai@umich.edu"),
+    person(given = "Leyi",
+           family = "Wang",
+           role = c("aut", "cre"),
+           email = "leyiw@umich.edu")
 Description: BasClu algorithmr: A hierarchical bayesian model for clustering of single-cell RNA-seqeuencing data.
+Depends:
+    R (>= 3.5),
+    Rcpp,
+    RArmadillo,
+    invgamma
+Imports:
+  graphics,
+  stats,
+  utils
+Suggests:
+    knitr,
+    devtools,
+    roxygen2,
+    testthat
 License: MIT
 Encoding: UTF-8
 LazyData: true

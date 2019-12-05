@@ -91,7 +91,7 @@ void deltaSample(vec& delta, int ng, int ns, mat& mis, mat& z, mat& psi, vec& si
 
 // Sample δ hyperparameter βδ from
 double beta_deltaSample(double a_l, double b_l, double alpha_delta, vec& delta, int ng){
-    R::rgamma(a_l + ng * alpha_delta, 1 / (b_l + sum(delta)));
+    return R::rgamma(a_l + ng * alpha_delta, 1 / (b_l + sum(delta)));
 }
 
 
@@ -321,7 +321,6 @@ void sampling(mat& x, rowvec& s, int NT, int nthin, int nupd, int Nburn,
     uvec idx_na = find_nonfinite(x), idx_nna = find_finite(x), idx;
     int ng = x.n_rows, ns = x.n_cols, l;
 
-    // binarize the matrix
     mat mis(ng, ns, fill::zeros);
     mis(idx_na).fill(1.0);
 
@@ -334,6 +333,7 @@ void sampling(mat& x, rowvec& s, int NT, int nthin, int nupd, int Nburn,
     for (int k = 0; k < nuc; k++){
         idx_c[k] = find(clu == uc(k));
     }
+
     mat psi, mut;
     List temp;
     vec step(4 * ng + 3, fill::ones);
