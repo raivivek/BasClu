@@ -1,3 +1,0 @@
-[ ] Read the statistical model of the  Bayesian Model for Clustering of Single-cell Data
-[ ] Setup project skeleton
-[ ] Review code published by authors and re-implement it in R
