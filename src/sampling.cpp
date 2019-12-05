@@ -1,6 +1,9 @@
-#include <RcppArmadillo.h>
+#include "RcppArmadillo.h"
 
-// [[Rcpp::depends("RcppArmadillo")]]
+// via the depends attribute we tell Rcpp to create hooks for
+// RcppArmadillo so that the build process will know what to do
+//
+// [[Rcpp::depends(RcppArmadillo)]]
 
 using namespace Rcpp;
 using namespace arma;
@@ -346,6 +349,8 @@ void sampling(mat& x, rowvec& s, int NT, int nthin, int nupd, int Nburn,
 
     // Do MCMC iterations; NT --> number of iterations
     for (int nt = 0; nt < NT; nt++){
+        Rcpp::checkUserInterrupt();
+
         gSample(g, ng, x, dz, sig2, s, gammam, denom, idx_na, nu_g, tausq_g, upd_g, step.rows(0, ng - 1));
 
         mus.zeros();
