@@ -22,8 +22,9 @@ dim(okaty)
 idx_genes <- sample(1:nrow(okaty), 100)
 
 count_mat <- as.matrix(okaty[, -(1:3)])
-transcript_lengths <- matrix(okaty[, 2], nrow = 1)
-result <- BasClu(count_mat, transcript_lengths, clustering = "BasCluZ", ...)
+transcript_lengths <- matrix(colSums(okaty[, 2]), nrow = 1)
+
+result <- basclu(count_mat, transcript_lengths, clustering = "BasCluZ", ...)
 ```
 
 ### Example dataset
