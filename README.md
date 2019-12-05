@@ -26,7 +26,14 @@ transcript_lengths <- matrix(colSums(okaty[, 2]), nrow = 1)
 
 result <- basclu(count_mat, transcript_lengths, clustering = "BasCluZ", ...)
 ```
+```
+library(BasClu)
+data("okaty")
+count_mat <- as.matrix(okaty[, -(1:3)])
+transcript_lengths <- matrix(colSums(okaty[, 2]), nrow = 1)
 
+result <- basclu(count_mat, transcript_lengths, clustering = "BasCluZ", ...)
+```
 ### Example dataset
 Package includes scRNA-seq example data from Okaty et al. (2015) consisting of a
 transcriptomic profiling of 5HT neurons.
