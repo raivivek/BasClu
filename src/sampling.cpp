@@ -347,7 +347,7 @@ void sampling(mat& x, rowvec& s, int NT, int nthin, int nupd, int Nburn,
     double lprob_alpha_lambda, lprob_beta_pi;
     mat mus = zeros<mat>(ng, ns);
 
-    // Do MCMC iterations; NT --> number of iterations
+    // Do MCMC iterations; NT--> number of iterations
     for (int nt = 0; nt < NT; nt++){
         Rcpp::checkUserInterrupt();
 
