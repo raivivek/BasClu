@@ -33,20 +33,84 @@ knitr::opts_chunk$set(tidy = FALSE,
                       message = FALSE, error = FALSE, warning = TRUE)
 ```
 
-# Introduction
+## Introduction
 
-## Rationale
+Liu _et al._ (2019) proposed a novel hierarchical clustering method under a Bayesian
+setting called BasClu (Bayesian scRNA-seq Clustering) for clustering of zero-inflated,
+sparse data from single-cell RNA-sequencing (scRNA-seq) experiments. Single-cell RNA-seq
+experiments, or in general any single-cell high throughput experiment, suffers from the
+dropout problem. Dropout is when you have a missing value in your observation but you
+don’t know if that’s a technical limitation or a biological observation. This presents
+challenges in common analysis such as clustering where we desire to find out features
+that are unique or shared across cells in our study.
+
+Here, we implement an R-package providing the BasClu algorithm along with a well
+documented, easy to use interface for applying the technique to new single-cell RNA-seq
+dataset. We also include complexity analysis of the algorithm and compare it to existing
+techniques. We hope our results will enable easy downstream analysis of growing
+single-cell RNA-seq datasets and facilitate future benchmarking studies.
+
+### Rationale
+
+While several methods have been proposed to develop methods robust to dropout, they
+ignore the empirical evidence of association between dropout rates and true value.
+BasClu, unlike existing methods that cluster cells based on gene expression values
+directly, infers and utilizes a dichotomized gene expression status to cluster cells. In
+addition BasClu explicitly models the missing probability for each gene to account for
+dropout events, and it also incorporates sequencing features, such as gene length and
+library size into the dropout modeling framework.
 
 ## Quick start
 
-# Usage
-## Input data
+### Installation
+```
+devtools::install_github("raivivek/BasClu")
+```
 
-# Epilogue
-## Acknowledgments
+### Usage
+
+We have included Okaty et al (2005) data within the package for a quick demonstration.
+
+```
+library(BasClu)
+
+data("okaty")
+dim(okaty)
+
+idx_genes <- sample(1:nrow(okaty), 100)
+
+count_mat <- as.matrix(okaty[, -(1:3)])
+transcript_lengths <- matrix(colSums(okaty[, 2]), nrow = 1)
+
+result <- basclu(count_mat, transcript_lengths, clustering = "BasCluZ", ...)
+```
+
+### Input data
+
+The input to BasClu is a log transformed raw gene by count matrix. The output is a
+posterior probability matrix which can then be clustered using two approaches discussed
+in the manuscript, namely BasCluZ and BasCluS.
+
+_BasCluZ_ is based on the hierarchical clustering of posterior estimates of the N × G
+binary expression status matrix.
+
+_BasCluS_ is on a posterior similarity matrix of cells and utilizes adjusted Rand index
+(ARI) as objective function to select number of clusters and the clustering structure.
+
+See reference for complete details.
+
+## Epilogue
+
+### Future work
+The package is a work in progress. While core functionality is implemented, it is not
+ready for bechmarking and production use. In future, we wish to completely integrated
+the _BasCluZ_ and _BasCluS_ functions within the package to enable an end-to-end
+analysis.
+
+### Acknowledgements
+We thank our course instructor Dr. Jian Kang for feedback on our idea.
 
 ## Session info
-
 ```{r sessionInfo}
 sessionInfo()
 ```
